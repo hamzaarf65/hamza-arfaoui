@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EnrollmentService implements IEnrollment {
 
-    public EnrollmentRepository enrollmentRepository;
+    public final EnrollmentRepository enrollmentRepository;
 
     @Override
     public List<Enrollment> getAllEnrollments() {
@@ -19,7 +19,10 @@ public class EnrollmentService implements IEnrollment {
 
     @Override
     public Enrollment getEnrollmentById(Long idEnrollment) {
-        return enrollmentRepository.findById(idEnrollment).isPresent() ? enrollmentRepository.findById(idEnrollment).get() : null;
+        return enrollmentRepository.findById(idEnrollment)
+                .orElseThrow(() -> new RuntimeException(
+                        "Enrollment not found with id: " + idEnrollment
+                ));
     }
 
     @Override

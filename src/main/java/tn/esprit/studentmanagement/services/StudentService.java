@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class StudentService implements IStudentService {
 
-    public StudentRepository studentRepository;
+    public final StudentRepository studentRepository;
     public List<Student> getAllStudents() { return studentRepository.findAll(); }
     public Student getStudentById(Long id) { return studentRepository.findById(id).orElse(null); }
     public Student saveStudent(Student student) { return studentRepository.save(student); }

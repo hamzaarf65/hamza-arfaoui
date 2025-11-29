@@ -11,7 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class DepartmentService implements IDepartmentService {
 
-     public DepartmentRepository departmentRepository;
+     public final DepartmentRepository departmentRepository;
+
 
     @Override
     public List<Department> getAllDepartments() {
@@ -20,10 +21,12 @@ public class DepartmentService implements IDepartmentService {
 
     @Override
     public Department getDepartmentById(Long idDepartment) {
-
-        return departmentRepository.findById(idDepartment).isPresent() ? departmentRepository.findById(idDepartment).get() : null;
-
+        return departmentRepository.findById(idDepartment)
+                .orElseThrow(() -> new RuntimeException(
+                        "Department not found with id: " + idDepartment
+                ));
     }
+
 
     @Override
     public Department saveDepartment(Department department) {
