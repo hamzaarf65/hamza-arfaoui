@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'M2_HOME'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -29,15 +25,6 @@ pipeline {
                 sh 'docker build -t medyassineelhaj/student-management:latest .'
             }
         }
-
-        // 👉 Tu rajouteras ce genre de stage plus tard quand tu feras SonarQube
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         withSonarQubeEnv('SonarQube') {
-        //             sh 'mvn sonar:sonar ...'
-        //         }
-        //     }
-        // }
     }
 
     post {
