@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "hamzaarfaoui/student-management"
+        DOCKER_TAG   = "latest"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -22,13 +27,34 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t medyassineelhaj/student-management:latest .'
+                // on construit l'image avec le même nom que sur Docker Hub
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+            }
+        }
+
+        stage('Push Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-cred',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                        docker push $DOCKER_IMAGE:$DOCKER_TAG
+                        docker logout
+                    '''
+                }
             }
         }
     }
 
     post {
-        success { echo 'Build SUCCESS 🎉' }
-        failure { echo 'Build FAILED ❌' }
+        success {
+            echo 'Build SUCCESS 🎉 Image poussée sur Docker Hub !'
+        }
+        failure {
+            echo 'Build FAILED ❌'
+        }
     }
 }
