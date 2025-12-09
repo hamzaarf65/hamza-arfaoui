@@ -40,4 +40,17 @@ class StudentServiceTest {
         assertEquals(2, result.size());
         verify(studentRepository).findAll();
     }
+    @Test
+    void getStudentById_shouldReturnStudent_WhenExists() {
+        Student s = new Student();
+        s.setId(1L);
+
+        when(studentRepository.findById(1L)).thenReturn(java.util.Optional.of(s));
+
+        Student result = studentService.getStudentById(1L);
+
+        assertEquals(1L, result.getId());
+        verify(studentRepository).findById(1L);
+    }
+
 }
