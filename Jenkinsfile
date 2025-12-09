@@ -19,6 +19,15 @@ pipeline {
             }
         }
 
+        stage('Code Quality - SonarQube') {
+    steps {
+        withSonarQubeEnv('local-sonarqube') {
+            sh 'mvn sonar:sonar -Dsonar.projectKey=student-management -Dsonar.projectName=student-management'
+        }
+    }
+}
+
+
         stage('Package') {
             steps {
                 sh 'mvn package -Dspring.profiles.active=test'
