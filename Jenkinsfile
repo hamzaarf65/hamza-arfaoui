@@ -22,10 +22,17 @@ pipeline {
         stage('Code Quality - SonarQube') {
     steps {
         withSonarQubeEnv('local-sonarqube') {
-            sh 'mvn sonar:sonar -Dsonar.projectKey=student-management -Dsonar.projectName=student-management'
+            sh """
+                mvn sonar:sonar \
+                  -Dsonar.projectKey=student-management \
+                  -Dsonar.projectName=student-management \
+                  -Dsonar.host.url=$SONAR_HOST_URL \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+            """
         }
     }
 }
+
 
 
         stage('Package') {
