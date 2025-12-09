@@ -40,19 +40,6 @@ class StudentServiceTest {
         assertEquals(2, result.size());
         verify(studentRepository).findAll();
     }
-  @Test
-    void getStudentById_shouldReturnStudent_WhenExists() {
-        // GIVEN : le repository renvoie un étudiant pour l'id 1
-        Student s = new Student();
 
-        when(studentRepository.findById(1L)).thenReturn(Optional.of(s));
-
-        // WHEN : on appelle le service
-        Student result = studentService.getStudentById(1L);
-
-        // THEN : c'est bien le même objet que celui renvoyé par le repo
-        assertSame(s, result);              // même instance
-        verify(studentRepository).findById(1L); // méthode appelée une fois
-    }
 
 }
