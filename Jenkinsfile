@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/hamzaarf65/hamza-arfaoui.git'
@@ -20,20 +21,18 @@ pipeline {
         }
 
         stage('Code Quality - SonarQube') {
-    steps {
-        withSonarQubeEnv('local-sonarqube') {
-            sh """
-                mvn sonar:sonar \
-                  -Dsonar.projectKey=student-management \
-                  -Dsonar.projectName=student-management \
-                  -Dsonar.host.url=$SONAR_HOST_URL \
-                  -Dsonar.token=$SONAR_AUTH_TOKEN
-            """
+            steps {
+                withSonarQubeEnv('local-sonarqube') {
+                    sh """
+                        mvn sonar:sonar \
+                          -Dsonar.projectKey=student-management \
+                          -Dsonar.projectName=student-management \
+                          -Dsonar.host.url=$SONAR_HOST_URL \
+                          -Dsonar.token=$SONAR_AUTH_TOKEN
+                    """
+                }
+            }
         }
-    }
-}
-
-
 
         stage('Package') {
             steps {
@@ -43,7 +42,6 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                // on construit l'image avec le même nom que sur Docker Hub
                 sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
@@ -63,11 +61,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    kubectl apply -f mysql-deployment.yaml -n esprit
+                    kubectl apply -f spring-deployment.yaml -n esprit
+                '''
+            }
+        }
     }
 
     post {
         success {
-            echo 'Build SUCCESS 🎉 Image poussée sur Docker Hub !'
+            echo 'Build SUCCESS 🎉 Image poussée sur Docker Hub et déployée sur Kubernetes !'
         }
         failure {
             echo 'Build FAILED ❌'
