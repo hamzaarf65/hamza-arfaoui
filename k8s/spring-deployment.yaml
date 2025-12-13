@@ -1,0 +1,65 @@
+# 1️⃣ ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-config
+  namespace: esprit
+data:
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql-service:3306/devopsdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+---
+# 2️⃣ Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: spring-secret
+  namespace: esprit
+type: Opaque
+data:
+  SPRING_DATASOURCE_USERNAME: cm9vdA==
+  SPRING_DATASOURCE_PASSWORD: cm9vdA==
+
+---
+# 3️⃣ Deployment Spring Boot
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-app
+  namespace: esprit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-app
+  template:
+    metadata:
+      labels:
+        app: spring-app
+    spec:
+      containers:
+        - name: spring-app
+          image: hamzaarfraoui/student-management
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8089
+          envFrom:
+            - configMapRef:
+                name: spring-config
+            - secretRef:
+                name: spring-secret
+
+---
+# 4️⃣ Service Spring Boot (NodePort)
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-service
+  namespace: esprit
+spec:
+  type: NodePort
+  selector:
+    app: spring-app
+  ports:
+    - port: 8089
+      targetPort: 8089
+
